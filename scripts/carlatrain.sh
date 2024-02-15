@@ -12,17 +12,17 @@ lr=1e-4
 
 for task_name in ${easy_task_list[@]};
 do
-LD_PRELOAD=/usr/lib/x86_64-linux-gnu/libffi.so.7	CUDA_VISIBLE_DEVICES=5  python carlatrain.py \
-                                                        task=${task_name} \
-                                                        seed=3 \
-                                                        action_repeat=${action_repeat} \
-                                                        use_wandb=${use_wandb} \
-                                                        use_tb=False \
-                                                        num_train_frames=${frames} \
-                                                        save_snapshot=${save_snapshot} \
-                                                        save_video=False \
-                                                        lr=${lr} \
-                                                        feature_dim=${feature_dim} \
-                                                        nstep=${nstep} \
-                                                        wandb_group=$1
+CUDA_VISIBLE_DEVICES=0  python carlatrain.py \
+                                task=${task_name} \
+                                seed=3 \
+                                action_repeat=${action_repeat} \
+                                use_wandb=${use_wandb} \
+                                use_tb=False \
+                                num_train_frames=${frames} \
+                                save_snapshot=${save_snapshot} \
+                                save_video=False \
+                                lr=${lr} \
+                                feature_dim=${feature_dim} \
+                                nstep=${nstep} \
+                                wandb_group="carla"
 done
