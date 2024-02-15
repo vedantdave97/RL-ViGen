@@ -56,10 +56,11 @@ class Workspace:
         
         self.setup()
 
+        model_dir = os.environ.get('MODEL_DIR')
         self.level = cfg.wandb_group.split('_')[0]
         assert self.level in ['train', 'test']
         self.agent_name = cfg.wandb_group.split('_')[1]
-        work_dir = f'{cfg.model_dir}/{self.agent_name}/{cfg.seed}'
+        work_dir = f'{model_dir}'
         self.model_work_dir = work_dir
         agent = torch.load('%s/snapshot.pt' % (work_dir), map_location='cuda:0')
         self.agent = agent['agent']
@@ -141,9 +142,6 @@ class Workspace:
 
         imageio.mimsave('%s/%s.gif' % (self.work_dir, self.agent_name), [np.array(img) for i, img in enumerate(images) if i % 1 == 0], fps=15)
 
-
-
-
     def robo_eval(self):
         """evaluate on robosuite."""
         step, episode, total_reward = 0, 0, 0
@@ -178,8 +176,10 @@ class Workspace:
                 if i < 100 and i % 10 == 0:
                     count += 1
                     print(f'==switch to the new scene {count}_id==')
+                    from wrappers.robo_wrapper import robo_make
                     self.eval_env = robo_make(name=self.cfg.task_name, action_repeat=self.cfg.action_repeat, frame_stack=self.cfg.frame_stack, seed=self.cfg.seed, scene_id=count)
-
+                    if self.cfg.save_video:
+                        self.robo_record_gif()
             episode += 1
         print(f'Seed {self.cfg.seed} Mean_reward: ', total_reward / episode)
 
@@ -257,9 +257,9 @@ class Workspace:
         for i in range(50):
             time_step = self.eval_env.reset()
             # To check wether the weather is successfully changed
-            if i == 0:
+            if i % 5 ==0:
                 plt.imshow(time_step.observation[6:9].transpose(1, 2, 0) / 255.)
-                plt.savefig(f'{self.work_dir}/test.png')
+                plt.savefig(f'{self.work_dir}/test{i}.png')
             # self.video_recorder.init(enabled=True)
             dist_driven_this_episode = 0.
             while not time_step.last():
@@ -310,7 +310,7 @@ class Workspace:
         print('---------------------------------')
         f = open("{}/file_{}.txt".format(self.work_dir, self.seed), 'a')
         f.write("seed: %f \n" % (self.seed))
-        f.write("weather_name: %s \n" % (self.env_weather_name))
+        #f.write("weather_name: %s \n" % (self.env_weather_name))
         f.write("reward: %f \n" % (float(total_reward / episode)))
         f.write("distance: %f \n" % (float(np.mean(distance_driven_each_episode))))
         f.write("steer: %f \n" % (steer / count))

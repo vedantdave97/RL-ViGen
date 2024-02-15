@@ -41,12 +41,13 @@ class Workspace:
         print(f'workspace: {self.work_dir}')
 
         self.cfg = cfg
+        model_dir = os.environ.get('MODEL_DIR')
         utils.set_seed_everywhere(cfg.seed)
         self.device = torch.device(cfg.device)
         self.setup()
         self.agent_name = cfg.wandb_group.split('_')[1]
         print(f'agent name: {self.agent_name}')
-        work_dir = f'{cfg.model_dir}/{self.agent_name}/{cfg.seed}'
+        work_dir = f'{model_dir}'
         self.model_work_dir = work_dir
         agent = torch.load('%s/snapshot.pt' % (work_dir), map_location='cuda:0')
         self.agent = agent['agent']
@@ -82,7 +83,8 @@ class Workspace:
             self.cfg.save_snapshot, self.cfg.nstep, self.cfg.discount)
         self._replay_iter = None
 
-        self.video_recorder = None
+        self.video_recorder = VideoRecorder(
+            self.work_dir if self.cfg.save_video else None)
         self.train_video_recorder = None
 
 
