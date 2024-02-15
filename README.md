@@ -151,6 +151,19 @@ cd RL-ViGen/
 bash scripts/train.sh
 ```
 ### CARLA
+Do this to configure the path:
+```
+export CARLA_ROOT=/home/vedant/RL-ViGen/third_party/carla
+export PYTHONPATH=/home/vedant/RL-ViGen/third_party/carla/PythonAPI/carla/agents
+export PYTHONPATH=$PYTHONPATH:${CARLA_ROOT}/PythonAPI/carla/dist/carla-0.9.10-py3.7-linux-x86_64.egg
+export PYTHONPATH=$PYTHONPATH:${CARLA_ROOT}/PythonAPI/carla
+```
+For WS1 use `Port = 2000`
+
+Before running the bash scripts, run this (and chenge the town accordingly):
+```
+./third_party/carla/CarlaUE4.sh /Game/Maps/Town04 -carla-server -benchmark -fps=15 -windowed -ResX=800 -ResY=600
+```
 ```
 cd RL-ViGen/
 bash scripts/carlatrain.sh
