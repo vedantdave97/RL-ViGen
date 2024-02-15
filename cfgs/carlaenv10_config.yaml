@@ -1,5 +1,5 @@
 ip: localhost
-port: 2018
+port: 2000
 traffic_manager_port: 8018
 max_episode_steps: 1000
 frame_skip: 2
