@@ -210,7 +210,7 @@ class Workspace:
                 self.replay_storage.add(time_step)
                 self.train_video_recorder.init(time_step.observation)
                 # try to save snapshot
-                if self.cfg.save_snapshot and (self.global_frame % int(5e4) == 0):
+                if self.cfg.save_snapshot and (self.global_frame % int(5e3) == 0):
                     self.save_snapshot()
                 episode_step = 0
                 episode_reward = 0
