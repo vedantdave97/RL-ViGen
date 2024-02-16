@@ -108,10 +108,12 @@ class Workspace:
 
     def eval(self):
         step, episode, total_reward = 0, 0, 0
+        rewards = []
         eval_until_episode = utils.Until(self.cfg.num_eval_episodes)
 
-        num_episodes = 100
+        num_episodes = 10
         for i in tqdm(range(num_episodes)):
+            episodic_reward = 0
             time_step = self.eval_env.reset()
             self.video_recorder.init_dmc(self.eval_env, enabled=True)
             while not time_step.last():
@@ -128,9 +130,11 @@ class Workspace:
                 time_step = self.eval_env.step(action)
                 self.video_recorder.record_dmc(self.eval_env, video=True)
                 total_reward += time_step.reward
+                episodic_reward += time_step.reward
                 step += 1
 
             episode += 1
+            rewards.append(episodic_reward)
             self.video_recorder.save(f'{i}.mp4')
 
         with self.logger.log_and_dump_ctx(self.global_frame, ty='eval') as log:
@@ -139,11 +143,8 @@ class Workspace:
             # log('episode', self.global_episode)
             log('step', self.global_step)
 
-        episode_reward_standard = total_reward / episode
-        print(f"Episode reward: {episode_reward_standard}")
-        
-        
-
+        print(f"Average Episodic reward: {np.mean(rewards)}")
+        print(f"Standard Deviation: {np.std(rewards)}")
 
     def save_snapshot(self):
         snapshot = self.work_dir / 'snapshot.pt'
@@ -160,7 +161,7 @@ class Workspace:
             self.__dict__[k] = v
 
 
-@hydra.main(config_path='cfgs', config_name='curl_config')
+@hydra.main(config_path='cfgs', config_name='svea_config')
 def main(cfg):
     from locodmc_eval import Workspace as W
     root_dir = Path.cwd()
